@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import bodyParser from "body-parser";
 import cors from "cors";
 import * as database from "./config/database";
+import mainV1Routes from "./api/v1/routes/index.route";
 
 dotenv.config();
 
@@ -15,9 +16,7 @@ app.use(bodyParser.json());
 
 app.use(cors());
 
-app.get("/topics", (req: Request, res: Response, next: NextFunction) => {
-  res.json({ topics: ["Music", "Movies", "Sports"] });
-});
+mainV1Routes(app);
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
