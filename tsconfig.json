@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "target": "ES6", // biên dịch code TS sang ES6
+    "module": "CommonJS", // sử dụng CommonJS để import và export module
+    "removeComments": true, // xóa các comment trong file JS sau khi biên dịch
+    "esModuleInterop": true, // cho phép import module từ file JS vào file TS dùng import thay require
+    "outDir": "dist" // thư mục chứa file JS sau khi biên dịch
+  }
+}
