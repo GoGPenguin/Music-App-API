@@ -1,27 +1,26 @@
 import mongoose from "mongoose";
 
-const topicSchema = new mongoose.Schema(
+const singerSchema = new mongoose.Schema(
   {
-    title: String,
+    fullName: String,
     avatar: String,
-    description: String,
     status: String,
     slug: String,
     deleted: {
       type: Boolean,
       default: false,
     },
-    deletedAt: Date,
     songs: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Song",
       },
     ],
+    deletedAt: Date,
   },
   {
     timestamps: true,
   }
 );
 
-export const Topic = mongoose.model("Topic", topicSchema);
+export const Singer = mongoose.model("Singer", singerSchema);
