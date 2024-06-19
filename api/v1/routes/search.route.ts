@@ -4,4 +4,5 @@ const router: Router = Router();
 
 router.get("/", controller.searchSongs);
 
+
 export const searchRoutes: Router = router;

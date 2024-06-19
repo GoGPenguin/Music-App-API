@@ -30,5 +30,5 @@ export const searchSongs = async (req: Request, res: Response) => {
     songs = await getInfoSong(newSongs);
     console.log(songs);
   }
-  res.json(songs);
+  res.status(200).json(songs);
 };

@@ -4,6 +4,7 @@ import { Topic } from "../models/topic.model";
 import { Singer } from "../models/singer.model";
 import FavoriteSong from "../models/favorite-song.model";
 import mongoose from "mongoose";
+import { convertToSlug } from "../../../helper/convertToSlug";
 
 // [GET] /api/v1/songs/:slugTopic
 export const list = async (req: Request, res: Response) => {
@@ -207,5 +208,98 @@ export const favorite = async (req: Request, res: Response) => {
     }
   } catch (error) {
     res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+// [PATCH] /api/v1/songs/play/:idSong
+export const play = async (req: Request, res: Response) => {
+  const idSong = req.params.idSong;
+
+  if (!mongoose.Types.ObjectId.isValid(idSong)) {
+    return res.status(400).json({
+      code: 400,
+      message: "Invalid song ID format",
+    });
+  }
+
+  try {
+    const song = await Song.findById(idSong);
+
+    if (!song) {
+      return res.status(404).json({
+        code: 404,
+        message: "Song not found",
+      });
+    }
+
+    song.playCount = song.playCount + 1;
+    await song.save();
+
+    res.json({
+      code: 200,
+      message: "Song played",
+      playCount: song.playCount + 1,
+    });
+  } catch (error) {
+    console.error("Error fetching or updating song:", error);
+    res.status(500).json({
+      code: 500,
+      message: "Internal server error",
+    });
+  }
+};
+
+// [POST] /api/v1/songs/create
+export const create = async (req: Request, res: Response) => {
+  const { title,  description, singer, topic } = req.body;
+  const avatar = req.body.avatar ? req.body.avatar[0] : null;
+  const audio = req.body.audio ? req.body.audio[0] : null;
+
+  try {
+    if (!title || !avatar || !description || !singer || !topic || !audio) {
+      return res.status(400).json({
+        message: "Missing required fields",
+      });
+    }
+
+    const singerExist = await Singer.findById(
+      new mongoose.Types.ObjectId(singer)
+    );
+    if (!singerExist) {
+      return res.status(404).json({
+        message: "Singer not found",
+      });
+    }
+
+    const topicExist = await Topic.findById(new mongoose.Types.ObjectId(topic));
+    if (!topicExist) {
+      return res.status(404).json({
+        message: "Topic not found",
+      });
+    }
+
+    const newSong = new Song({
+      title,
+      avatar,
+      audio,
+      description,
+      singer: new mongoose.Types.ObjectId(singer),
+      topic: new mongoose.Types.ObjectId(topic),
+      slug: convertToSlug(title),
+    });
+
+    await newSong.save();
+
+    singerExist.songs.push(newSong._id);
+    topicExist.songs.push(newSong._id);
+
+    await singerExist.save();
+    await topicExist.save();
+    res.status(200).json({
+      message: "Song created successfully",
+      newSong,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message || "Internal server error" });
   }
 };

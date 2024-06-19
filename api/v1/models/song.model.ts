@@ -9,7 +9,14 @@ const songSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Topic",
     },
-    like: Number,
+    like: {
+      type: Number,
+      default: 0,
+    },
+    playCount: {
+      type: Number,
+      default: 0,
+    },
     lyric: String,
     audio: String,
     singer: {
@@ -22,7 +29,10 @@ const songSchema = new mongoose.Schema(
         ref: "User",
       },
     ],
-    status: String,
+    status: {
+      type: String,
+      default: "active",
+    },
     slug: String,
     deleted: {
       type: Boolean,
