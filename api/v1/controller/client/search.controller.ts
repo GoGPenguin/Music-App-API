@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
 import { Request, Response } from "express";
-import { Song } from "../models/song.model";
-import { getInfoSong } from "../../../helper/getInfoSong";
-import { convertToSlug } from "../../../helper/convertToSlug";
+import { Song } from "../../models/song.model";
+import { getInfoSong } from "../../../../helper/getInfoSong";
+import { convertToSlug } from "../../../../helper/convertToSlug";
 
 //[GET] /api/v1/search?keyword=...
 export const searchSongs = async (req: Request, res: Response) => {

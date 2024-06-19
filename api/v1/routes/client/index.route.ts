@@ -5,15 +5,15 @@ import { favoriteSongRoutes } from "./favorite-song.route";
 import { searchRoutes } from "./search.route";
 
 const mainV1Routes = (app: Express): void => {
-    const version = "/api/v1";
+  const version = "/api/v1";
 
-    app.use(`${version}/topics`, topicRoutes);
-    
-    app.use(`${version}/songs`, songRoutes);
+  app.use(`${version}/topics`, topicRoutes);
 
-    app.use(`${version}/favorite-songs`, favoriteSongRoutes);
+  app.use(`${version}/songs`, songRoutes);
 
-    app.use(`${version}/search`, searchRoutes);
-}
+  app.use(`${version}/favorite-songs`, favoriteSongRoutes);
+
+  app.use(`${version}/search`, searchRoutes);
+};
 
 export default mainV1Routes;
