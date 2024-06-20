@@ -4,20 +4,34 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import * as database from "./config/database";
 import mainV1Routes from "./api/v1/routes/client/index.route";
+import { ApolloServer, gql } from "apollo-server-express";
+import { typeDefs } from "./typeDefs";
+import { resolvers } from "./resolvers";
 
-dotenv.config();
+const startServer = async () => {
+  dotenv.config();
 
-database.connect();
+  database.connect();
 
-const app: Express = express();
-const port: number | string = process.env.PORT || 3000;
+  const app: Express = express();
+  const port: number | string = process.env.PORT || 3000;
 
-app.use(bodyParser.urlencoded({ extended: false }));
+  //GraphQL
+  const apolloServer = new ApolloServer({ typeDefs, resolvers });
 
-app.use(cors());
+  await apolloServer.start();
 
-mainV1Routes(app);
+  apolloServer.applyMiddleware({ app, path: "/graphql" });
 
-app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
-});
+  app.use(bodyParser.urlencoded({ extended: false }));
+
+  app.use(cors());
+
+  mainV1Routes(app);
+
+  app.listen(port, () => {
+    console.log(`Server is running on http://localhost:${port}`);
+  });
+};
+
+startServer();
