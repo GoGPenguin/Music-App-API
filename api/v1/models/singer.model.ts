@@ -10,12 +10,10 @@ const singerSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    songs: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Song",
-      },
-    ],
+    song: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Song",
+    },
     deletedAt: Date,
   },
   {

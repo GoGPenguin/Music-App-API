@@ -76,11 +76,7 @@ export const createSong = async (req: Request, res: Response) => {
 
     await newSong.save();
 
-    singerExist.songs.push(newSong._id);
-    topicExist.songs.push(newSong._id);
 
-    await singerExist.save();
-    await topicExist.save();
     res.status(200).json({
       message: "Song created successfully",
       newSong,
@@ -184,20 +180,6 @@ export const editSong = async (req: Request, res: Response) => {
 
     await song.save();
 
-    if (song.singer.toString() !== singer) {
-      const oldSinger = await Singer.findById(song.singer);
-      oldSinger.songs.splice(oldSinger.songs.indexOf(song._id), 1);
-      singerExist.songs.push(song._id);
-      await oldSinger.save();
-      await singerExist.save();
-    }
-    if (song.topic.toString() !== topic) {
-      const oldTopic = await Topic.findById(song.topic);
-      oldTopic.songs.splice(oldTopic.songs.indexOf(song._id), 1);
-      topicExist.songs.push(song._id);
-      await oldTopic.save();
-      await topicExist.save();
-    }
 
     res.status(200).json({
       message: "Song updated successfully",

@@ -12,12 +12,10 @@ const topicSchema = new mongoose.Schema(
       default: false,
     },
     deletedAt: Date,
-    songs: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Song",
-      },
-    ],
+    song: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Song",
+    },
   },
   {
     timestamps: true,
