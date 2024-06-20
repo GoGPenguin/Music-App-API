@@ -1,4 +1,3 @@
-import mongoose from "mongoose";
 import { Request, Response } from "express";
 import { Song } from "../../models/song.model";
 import { getInfoSong } from "../../../../helper/getInfoSong";

@@ -30,14 +30,26 @@ export const typeDefsSong = gql`
     audio: String!
   }
 
+  input Filter {
+    key: String!
+    value: String!
+  }
+
   type Query {
-    getAllSongs: [Song]
+    getAllSongs(
+      sortKey: String
+      sortValue: String
+      currentPage: Int
+      perPage: Int
+      filter: [Filter],
+      search: String
+    ): [Song]
     getDetailSong(id: ID): Song
   }
 
   type Mutation {
-    createSong(song: SongInput): Song
-    deleteSong(id: ID): String
-    updateSong(id: ID, song: SongInput): Song
+    createSong(song: SongInput!): Song
+    deleteSong(id: ID!): String
+    updateSong(id: ID!, song: SongInput!): Song
   }
 `;

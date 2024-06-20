@@ -4,7 +4,6 @@ import { Topic } from "../../models/topic.model";
 import { Singer } from "../../models/singer.model";
 import FavoriteSong from "../../models/favorite-song.model";
 import mongoose from "mongoose";
-import { convertToSlug } from "../../../../helper/convertToSlug";
 
 // [GET] /api/v1/songs/:slugTopic
 export const list = async (req: Request, res: Response) => {
