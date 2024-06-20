@@ -1,12 +1,12 @@
-import express, { Express, Request, Response, NextFunction } from "express";
+import express, { Express } from "express";
 import dotenv from "dotenv";
 import bodyParser from "body-parser";
 import cors from "cors";
 import * as database from "./config/database";
 import mainV1Routes from "./api/v1/routes/client/index.route";
-import { ApolloServer, gql } from "apollo-server-express";
-import { typeDefs } from "./typeDefs";
-import { resolvers } from "./resolvers";
+import { ApolloServer } from "apollo-server-express";
+import { typeDefs } from "./api/v1/typeDefs/index.typeDefs";
+import { resolvers } from "./api/v1/resolvers/index.resolvers";
 
 const startServer = async () => {
   dotenv.config();
@@ -17,7 +17,10 @@ const startServer = async () => {
   const port: number | string = process.env.PORT || 3000;
 
   //GraphQL
-  const apolloServer = new ApolloServer({ typeDefs, resolvers });
+  const apolloServer = new ApolloServer({
+    typeDefs: typeDefs,
+    resolvers: resolvers,
+  });
 
   await apolloServer.start();
 

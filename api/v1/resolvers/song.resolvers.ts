@@ -1,8 +1,6 @@
-import { Song } from "./api/v1/models/song.model";
-import { Topic } from "./api/v1/models/topic.model";
-import { Singer } from "./api/v1/models/singer.model";
+import { Song } from "../models/song.model";
 
-export const resolvers = {
+export const resolversSong = {
   Query: {
     getAllSongs: async () => {
       const songs = await Song.find({

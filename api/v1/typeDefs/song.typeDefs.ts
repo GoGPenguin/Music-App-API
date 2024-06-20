@@ -1,6 +1,6 @@
 import { gql } from "apollo-server-express";
 
-export const typeDefs = gql`
+export const typeDefsSong = gql`
   type Song {
     id: ID!
     title: String!
@@ -8,15 +8,6 @@ export const typeDefs = gql`
     description: String!
     topic: Topic!
     singer: Singer!
-    audio: String!
-  }
-
-  input SongInput {
-    title: String!
-    avatar: String!
-    description: String!
-    topic: ID!
-    singer: ID!
     audio: String!
   }
 
@@ -30,14 +21,23 @@ export const typeDefs = gql`
     fullName: String!
   }
 
+  input SongInput {
+    title: String!
+    avatar: String!
+    description: String!
+    topic: ID!
+    singer: ID!
+    audio: String!
+  }
+
   type Query {
     getAllSongs: [Song]
     getDetailSong(id: ID): Song
   }
 
   type Mutation {
-    createSong(song: SongInput): Song,
-    deleteSong(id: ID): String,
+    createSong(song: SongInput): Song
+    deleteSong(id: ID): String
     updateSong(id: ID, song: SongInput): Song
   }
 `;
