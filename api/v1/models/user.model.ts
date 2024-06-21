@@ -1,21 +1,26 @@
 import mongoose from "mongoose";
+import { generateRandomNumber } from "../../../helper/generate";
 
-const userSchema = new mongoose.Schema({
+const userSchema = new mongoose.Schema(
+  {
     fullName: String,
     email: String,
     password: String,
     token: {
-        type: String,
+      type: String,
+      default: generateRandomNumber(30),
     },
     deleted: {
-        type: Boolean,
-        default: false
+      type: Boolean,
+      default: false,
     },
     deletedAt: Date,
-}, {
-    timestamps: true
-})
+  },
+  {
+    timestamps: true,
+  }
+);
 
-const User = mongoose.model('User', userSchema)
+export const User = mongoose.model("User", userSchema);
 
-export default User;
+
