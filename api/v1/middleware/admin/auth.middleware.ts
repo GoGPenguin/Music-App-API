@@ -13,7 +13,7 @@ export const requireAuth = async (
 
   const token = req.cookies.token || bearer;
 
-  const user = await verifyToken(token, "client");
+  const user = await verifyToken(token, "admin");
   if (!user) {
     return res.status(401).json({
       message: "User is not authenticated!",

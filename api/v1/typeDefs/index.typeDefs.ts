@@ -1,4 +1,5 @@
 import { typeDefsSong } from "./song.typeDefs";
-import { typeDefsUser } from "./user.typeDefs";
 
-export const typeDefs = [typeDefsSong, typeDefsUser];
+import { typeDefsTopic } from "./topic.typeDefs";
+
+export const typeDefs = [typeDefsSong,  typeDefsTopic];

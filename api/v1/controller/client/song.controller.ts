@@ -5,6 +5,16 @@ import { Singer } from "../../models/singer.model";
 import FavoriteSong from "../../models/favorite-song.model";
 import mongoose from "mongoose";
 
+// [GET] /api/v1/songs
+export const index = async (req: Request, res: Response) => {
+  const songs = await Song.find({
+    status: "active",
+    deleted: false,
+  });
+
+  res.status(200).json({ songs: songs });
+};
+
 // [GET] /api/v1/songs/:slugTopic
 export const list = async (req: Request, res: Response) => {
   const { slugTopic } = req.params;

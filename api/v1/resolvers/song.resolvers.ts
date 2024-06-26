@@ -1,4 +1,5 @@
 import { Song } from "../models/song.model";
+import { Topic } from "../models/topic.model";
 import { convertToSlug } from "../../../helper/convertToSlug";
 
 export const resolversSong = {
@@ -13,7 +14,7 @@ export const resolversSong = {
       }
 
       currentPage = currentPage || 1;
-      perPage = perPage || 10;
+      perPage = perPage || null;
 
       const filterField = {};
 
@@ -57,37 +58,94 @@ export const resolversSong = {
       return songs;
     },
 
-    getDetailSong: async (_, { id }) => {
-      const song = await Song.findById(id).populate("topic").populate("singer");
-
-      return song;
-    },
-  },
-
-  Mutation: {
-    createSong: async (_, { song }) => {
-      const newSong = await Song.create(song);
-
-      return newSong;
-    },
-
-    deleteSong: async (_, { id }) => {
-      const song = await Song.findById(id);
+    getDetailSong: async (_, { slug }) => {
+      const song = await Song.findOne({
+        slug,
+        status: "active",
+        deleted: false,
+      })
+        .populate("topic", "title")
+        .populate("singer", "fullName");
 
       if (!song) {
-        throw new Error("Song not found!");
+        return {
+          code: 404,
+          message: "Song not found!",
+        };
       }
-
-      song.deleted = true;
-      await song.save();
-
-      return "Song deleted!";
+      return {
+        code: 200,
+        message: "Success!",
+        song
+      }
     },
 
-    updateSong: async (_, { id, song }) => {
-      const songUpdated = await Song.findByIdAndUpdate(id, song);
+    getSongsByTopic: async (_, { topicSlug }) => {
+      try {
+        const topicId = await Topic.find({ slug: topicSlug }).select("_id");
+        if (!topicId)
+          return {
+            code: 404,
+            message: "Topic not found!",
+          };
 
-      return songUpdated;
+        const songs = await Song.find({
+          topic: topicId,
+          status: "active",
+          deleted: false,
+        })
+          .populate("topic", "title")
+          .populate("singer", "fullName");
+
+        return songs;
+      } catch (error) {
+        console.log(error);
+        return {
+          code: 500,
+          message: "Internal server error!",
+        };
+      }
     },
   },
+
+  // Mutation: {
+  //   createSong: async (_, { song }) => {
+  //     const newSong = await Song.create(song);
+
+  //     return newSong;
+  //   },
+
+  //   deleteSong: async (_, { id }) => {
+  //     try {
+  //       const song = await Song.findById(id);
+
+  //       if (!song) {
+  //         return {
+  //           code: 404,
+  //           message: "Song not found!",
+  //         };
+  //       }
+  
+  //       song.deleted = true;
+  //       await song.save();
+  
+  //       return {
+  //         code: 200,
+  //         message: "Song deleted successfully!",
+  //       };
+  //     } catch (error) {
+  //       console.log(error);
+  //       return {
+  //         code: 500,
+  //         message: "Internal server error!",
+  //       };
+  //     }
+  //   },
+
+  //   updateSong: async (_, { id, song }) => {
+  //     const songUpdated = await Song.findByIdAndUpdate(id, song);
+
+  //     return songUpdated;
+  //   },
+  // },
 };

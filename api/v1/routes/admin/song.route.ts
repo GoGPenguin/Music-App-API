@@ -9,6 +9,12 @@ const router: Router = Router();
 
 router.get("/", controller.index);
 
+router.get("/:slugTopic", controller.songsByTopic)
+
+router.get("/singer/:slugSinger", controller.songsBySinger);
+
+router.get('/detail/:slug', controller.detail);
+
 router.get("/create", controller.create);
 
 router.post(
@@ -32,5 +38,7 @@ router.patch(
   uploadCloud.uploadMultiple,
   controller.editSong
 );
+
+router.delete("/delete/:idSong", controller.deleteSong);
 
 export const songsRoutes: Router = router;

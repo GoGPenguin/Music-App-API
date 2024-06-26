@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
-import { Topic } from "../../models/topic.model";
+import { Singer } from "../../models/singer.model";
+import { convertToSlug } from "../../../../helper/convertToSlug";
 
-// [GET] /api/v1/topics
+// [GET] /api/v1/singers
 export const index = async (req: Request, res: Response) => {
   const { searchKey, currentPage, perPage } = req.query;
   const currentPageValue = parseInt(currentPage as string) || 1;
@@ -14,7 +15,7 @@ export const index = async (req: Request, res: Response) => {
   }
 
   try {
-    const topics = await Topic.find({
+    const singers = await Singer.find({
       ...query,
       status: "active",
       deleted: false,
@@ -22,7 +23,7 @@ export const index = async (req: Request, res: Response) => {
       .skip((currentPageValue - 1) * perPageValue)
       .limit(perPageValue);
 
-    res.status(200).json({ topics: topics });
+    res.status(200).json({ singers: singers });
   } catch (error) {
     res.status(500).json({
       message: error.message || "Internal server error",
@@ -30,29 +31,29 @@ export const index = async (req: Request, res: Response) => {
   }
 };
 
-// [GET] /api/v1/topics/detail/:idTopic
+// [GET] /api/v1/singers/detail/:idSinger
 export const detail = async (req: Request, res: Response) => {
-  const { idTopic } = req.params;
-  if (!idTopic) {
+  const { idSinger } = req.params;
+  if (!idSinger) {
     return res.status(400).json({
       message: "Missing required fields",
     });
   }
 
   try {
-    const topic = await Topic.findOne({
-      _id: idTopic,
+    const singer = await Singer.findOne({
+      _id: idSinger,
       status: "active",
       deleted: false,
     });
 
-    if (!topic) {
+    if (!singer) {
       return res.status(404).json({
-        message: "Topic not found",
+        message: "Singer not found",
       });
     }
 
-    res.status(200).json({ topic });
+    res.status(200).json({ singer });
   } catch (error) {
     res.status(500).json({
       message: error.message || "Internal server error",
@@ -60,23 +61,25 @@ export const detail = async (req: Request, res: Response) => {
   }
 };
 
-// [POST] /api/v1/topics/create
+// [POST] /api/v1/singers/create
 export const create = async (req: Request, res: Response) => {
-  const { name, description } = req.body;
-  if (!name || !description) {
+  const { fullName, avatar } = req.body;
+  if (!fullName || !avatar) {
     return res.status(400).json({
       message: "Missing required fields",
     });
   }
 
   try {
-    const topic = new Topic({
-      name,
-      description,
+    const singer = new Singer({
+      fullName,
+      avatar,
+      slug: convertToSlug(fullName),
     });
 
-    await topic.save();
-    res.status(201).json({ topic });
+    await singer.save();
+
+    res.status(201).json({ singer });
   } catch (error) {
     res.status(500).json({
       message: error.message || "Internal server error",
@@ -84,35 +87,36 @@ export const create = async (req: Request, res: Response) => {
   }
 };
 
-// [PATCH] /api/v1/topics/edit/:idTopic
+// [PATCH] /api/v1/singers/edit/:idSinger
 export const edit = async (req: Request, res: Response) => {
-  const { idTopic } = req.params;
-  const { title, description, avatar } = req.body;
-  if (!idTopic || !title || !description || !avatar) {
+  const { idSinger } = req.params;
+  const { fullName, avatar } = req.body;
+  if (!idSinger || !fullName || !avatar) {
     return res.status(400).json({
       message: "Missing required fields",
     });
   }
 
   try {
-    const topic = await Topic.findOne({
-      _id: idTopic,
+    const singer = await Singer.findOne({
+      _id: idSinger,
       status: "active",
       deleted: false,
     });
 
-    if (!topic) {
+    if (!singer) {
       return res.status(404).json({
-        message: "Topic not found",
+        message: "Singer not found",
       });
     }
 
-    topic.title = title;
-    topic.description = description;
-    topic.avatar = avatar;
+    singer.fullName = fullName;
+    singer.avatar = avatar;
+    singer.slug = convertToSlug(fullName);
 
-    await topic.save();
-    res.status(200).json({ topic });
+    await singer.save();
+
+    res.status(200).json({ singer });
   } catch (error) {
     res.status(500).json({
       message: error.message || "Internal server error",
@@ -120,31 +124,35 @@ export const edit = async (req: Request, res: Response) => {
   }
 };
 
-// [DELETE] /api/v1/topics/delete/:idTopic
-export const deleteTopic = async (req: Request, res: Response) => {
-  const { idTopic } = req.params;
-  if (!idTopic) {
+// [DELETE] /api/v1/singers/delete/:idSinger
+export const deleteSinger = async (req: Request, res: Response) => {
+  const { idSinger } = req.params;
+  if (!idSinger) {
     return res.status(400).json({
       message: "Missing required fields",
     });
   }
 
   try {
-    const topic = await Topic.findOne({
-      _id: idTopic,
+    const singer = await Singer.findOne({
+      _id: idSinger,
       status: "active",
       deleted: false,
     });
 
-    if (!topic) {
+    if (!singer) {
       return res.status(404).json({
-        message: "Topic not found",
+        message: "Singer not found",
       });
     }
 
-    topic.deleted = true;
-    await topic.save();
-    res.status(200).json({ message: "Delete topic successfully" });
+    singer.deleted = true;
+
+    await singer.save();
+
+    res.status(200).json({
+      message: "Singer deleted successfully",
+    });
   } catch (error) {
     res.status(500).json({
       message: error.message || "Internal server error",

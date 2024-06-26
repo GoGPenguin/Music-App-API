@@ -5,16 +5,64 @@ import { Singer } from "../../models/singer.model";
 import mongoose from "mongoose";
 import { convertToSlug } from "../../../../helper/convertToSlug";
 
-
+// [GET] /api/v1/songs
 export const index = async (req: Request, res: Response) => {
-  const songs = await Song.find({
-    status: "active",
-    deleted: false,
-  });
+  const { searchKey, currentPage, perPage } = req.query;
+  const currentPageValue = parseInt(currentPage as string) || 1;
+  const perPageValue = parseInt(perPage as string) || null;
 
-  console.log(songs);
+  let query = {};
+  if (searchKey) {
+    query = {
+      slug: new RegExp(convertToSlug(searchKey as string), "i"),
+    };
+  }
 
-  res.status(200).json({ songs: songs });
+  try {
+    const songs = await Song.find({
+      ...query,
+      status: "active",
+      deleted: false,
+    })
+      .skip((currentPageValue - 1) * perPageValue)
+      .limit(perPageValue);
+
+    res.status(200).json({ songs: songs });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || "Internal server error",
+    });
+  }
+};
+
+// [GET] /api/v1/songs/detail/:idSong
+export const detail = async (req: Request, res: Response) => {
+  const { idSong } = req.params;
+  if (!idSong) {
+    return res.status(400).json({
+      message: "Missing required fields",
+    });
+  }
+
+  try {
+    const song = await Song.findOne({
+      _id: new mongoose.Types.ObjectId(idSong),
+      status: "active",
+      deleted: false,
+    });
+
+    if (!song) {
+      return res.status(404).json({
+        message: "Song not found",
+      });
+    }
+
+    res.status(200).json({ song });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || "Internal server error",
+    });
+  }
 };
 
 //[GET] /api/v1/songs/create
@@ -75,7 +123,6 @@ export const createSong = async (req: Request, res: Response) => {
     });
 
     await newSong.save();
-
 
     res.status(200).json({
       message: "Song created successfully",
@@ -180,11 +227,82 @@ export const editSong = async (req: Request, res: Response) => {
 
     await song.save();
 
-
     res.status(200).json({
       message: "Song updated successfully",
       song,
     });
+  } catch (error) {
+    res.status(500).json({ message: error.message || "Internal server error" });
+  }
+};
+
+// [DELETE] /api/v1/songs/delete/:idSong
+export const deleteSong = async (req: Request, res: Response) => {
+  const { idSong } = req.params;
+
+  try {
+    const song = await Song.findById(new mongoose.Types.ObjectId(idSong));
+
+    if (!song) {
+      return res.status(404).json({
+        message: "Song not found",
+      });
+    }
+
+    song.deleted = true;
+    await song.save();
+
+    res.status(200).json({
+      message: "Song deleted successfully",
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message || "Internal server error" });
+  }
+};
+
+// [GET] /api/v1/songs/:slugTopic
+export const songsByTopic = async (req: Request, res: Response) => {
+  const { slugTopic } = req.params;
+
+  try {
+    const songs = await Song.find({
+      status: "active",
+      deleted: false,
+    })
+      .populate({ path: "topic", match: { slug: slugTopic } })
+      .populate("singer");
+
+    if (!songs) {
+      return res.status(404).json({
+        message: "Songs not found",
+      });
+    }
+
+    res.status(200).json({ songs });
+  } catch (error) {
+    res.status(500).json({ message: error.message || "Internal server error" });
+  }
+};
+
+// [GET] /api/v1/songs/singer/:slugSinger
+export const songsBySinger = async (req: Request, res: Response) => {
+  const { slugSinger } = req.params;
+
+  try {
+    const songs = await Song.find({
+      status: "active",
+      deleted: false,
+    })
+      .populate({ path: "singer", match: { slug: slugSinger } })
+      .populate("topic");
+
+    if (!songs) {
+      return res.status(404).json({
+        message: "Songs not found",
+      });
+    }
+
+    res.status(200).json({ songs });
   } catch (error) {
     res.status(500).json({ message: error.message || "Internal server error" });
   }

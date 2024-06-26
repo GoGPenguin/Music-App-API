@@ -1,7 +1,4 @@
-import { resolversSong } from './song.resolvers';
-import { resolversUser } from './user.resolvers';
+import { resolversSong } from "./song.resolvers";
+import { resolversTopic } from "./topic.resolvers";
 
-export const resolvers = [
-    resolversSong,
-    resolversUser
-]
+export const resolvers = [resolversSong, resolversTopic];
